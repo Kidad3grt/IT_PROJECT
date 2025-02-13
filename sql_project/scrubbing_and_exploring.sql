@@ -9,6 +9,10 @@ WHERE
   job_no_degree_mention=true;
 
 --Code for running subquery
+/*Explanation:
+Fetches company_id and company_name from company_dim.
+Filters companies where company_id exists in job_postings_fact with job_no_degree_mention = 1.
+Removes the unnecessary ORDER BY from the subquery.*/
 SELECT 
   company_id,name as company_name 
 from company_dim
@@ -23,6 +27,14 @@ order by
    company_id
 );
 
+/*Explanation:
+Counts job postings (job_id) where job_title_short = 'Data Analyst'.
+Categorizes locations as:
+'Remote' → when job_location = 'Anywhere'
+'Local' → when job_location = 'New York, NY'
+'Onsite' → all other locations.
+Groups by the same CASE condition (since aliases can’t be used in GROUP BY).
+Orders by job count (number_of_jobs DESC) to show the highest count first*/
 SELECT 
 	COUNT(job_id) AS number_of_jobs,
     CASE
@@ -73,7 +85,7 @@ ROW_NUMBER() OVER( PARTITION BY  job_id,
     WITH duplicate_cte AS
     (
     select *,
-    ROW_NUMBER() OVER( ff
+    ROW_NUMBER() OVER(
     PARTITION BY  job_id,
     company_id,
     job_title_short,
